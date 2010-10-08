@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin::libs;
+use lib "$FindBin::Bin/lib";
+
+#use Creyle2;
+#my $proj = Creyle2->env_project;
+
+use Compiler::Closure;
+use YAML;
+use Getopt::Long;
+use Path::Class;
+
+my $config_file;
+my @sources;
+my @signatures;
+my $raw_file;
+my $compiled_file;
+
+GetOptions(
+    'config|c=s' => \$config_file,
+    'sources|f=s'  => \@sources,
+    'signatures|s=s'  => \@signatures,
+    'raw_file|r=s'  => \$raw_file,
+    'compiled_file|o=s'  => \$compiled_file,
+);
+
+my $config = $config_file ? YAML::LoadFile($config_file) : {};
+
+$config->{sources} = [@{ $config->{sources}||[] },@sources] if @sources;
+$config->{signatures} = [@{ $config->{signatures}||[] },@signatures] if @signatures;
+$config->{base_dir} = file($config_file)->dir->stringify."/" unless($config->{base_dir});
+$config->{output} ||= {};
+$config->{output}->{raw} = $raw_file if $raw_file;
+$config->{output}->{compiled} = $compiled_file if $compiled_file;
+$config->{jar} ||= $ENV{CLOSURE_COMPILER_JAR};
+Compiler::Closure->new(%$config)->compile;
+
+exit;
