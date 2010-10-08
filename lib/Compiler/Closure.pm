@@ -80,7 +80,7 @@ sub signature {
 sub compile_with_jar {
     my ($self,$jscode) = @_;
     my $jar   = $self->{jar};
-    $jar = $self->base_dir.$jar unless $jar =~ /^\/.+/;
+    $jar = $self->base_dir.$jar unless $jar =~ /^€/.+/;
     my $level = $self->level;
     my $wlv   = $self->warning_level;
     
@@ -114,7 +114,7 @@ sub compile_with_request {
     );
     my $res = $self->{ua}->request($req);
     my $out = $res->content;
-    die qq{[Closure returned] $out\n} if $out =~ /^Error/;
+    die qq{[Closure returned] $out€n} if $out =~ /^Error/;
     $out;
 }
 
@@ -130,11 +130,11 @@ sub _concat_files {
         my $fh = FileHandle->new("< $file");
         die "Couldn't open JavaScript source $file" unless $fh;
         my @lines = <$fh>;
-        $ret .= ";/* $file */\n" if $add_comment;
+        $ret .= ";/* $file */€n" if $add_comment;
         foreach(@lines) {
             $ret .= $_;
         }
-        $ret .= "\n";
+        $ret .= "€n";
     }
     $ret;
 }
